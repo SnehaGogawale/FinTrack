@@ -4,6 +4,10 @@ import com.fintrack.fintrack.dto.UserRequest;
 import com.fintrack.fintrack.dto.UserResponse;
 import com.fintrack.fintrack.entity.User;
 import com.fintrack.fintrack.service.UserService;
+
+import jakarta.validation.Valid;
+
+
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
@@ -35,7 +39,8 @@ public class UserController {
     }
 
     @PostMapping
-    public ResponseEntity<UserResponse> createUser(@RequestBody UserRequest request) {
+    public ResponseEntity<UserResponse> createUser(
+        @Valid @RequestBody UserRequest request) {
 
         User user = new User(
                 request.getName(),
