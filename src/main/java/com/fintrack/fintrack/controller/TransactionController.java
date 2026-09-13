@@ -36,6 +36,23 @@ public class TransactionController {
 
         return ResponseEntity.ok(convertToResponse(transaction));
     }
+    @PutMapping("/{id}")
+public ResponseEntity<TransactionResponse> updateTransaction(
+        @PathVariable Long id,
+        @Valid @RequestBody TransactionRequest request,
+        @AuthenticationPrincipal Jwt jwt) {
+
+    Long userId = jwt.getClaim("userId");
+
+    Transaction transaction =
+            transactionService.updateTransaction(
+                    id,
+                    userId,
+                    request
+            );
+
+    return ResponseEntity.ok(convertToResponse(transaction));
+}
 
     @GetMapping
     public ResponseEntity<List<TransactionResponse>> getTransactions(
@@ -53,13 +70,16 @@ public class TransactionController {
     }
 
     @DeleteMapping("/{id}")
-    public ResponseEntity<Void> deleteTransaction(
-            @PathVariable Long id) {
+public ResponseEntity<Void> deleteTransaction(
+        @PathVariable Long id,
+        @AuthenticationPrincipal Jwt jwt) {
 
-        transactionService.deleteTransaction(id);
+    Long userId = jwt.getClaim("userId");
 
-        return ResponseEntity.noContent().build();
-    }
+    transactionService.deleteTransaction(id, userId);
+
+    return ResponseEntity.noContent().build();
+}
 
     private TransactionResponse convertToResponse(
             Transaction transaction) {

@@ -49,8 +49,31 @@ public class TransactionService {
         return transactionRepository.findByUserId(userId);
     }
 
-    public void deleteTransaction(Long transactionId) {
+    public void deleteTransaction(Long transactionId, Long userId) {
 
-        transactionRepository.deleteById(transactionId);
-    }
+    Transaction transaction = transactionRepository
+            .findByIdAndUserId(transactionId, userId)
+            .orElseThrow(() ->
+                    new RuntimeException("Transaction not found"));
+
+    transactionRepository.delete(transaction);
+}
+public Transaction updateTransaction(
+        Long transactionId,
+        Long userId,
+        TransactionRequest request) {
+
+    Transaction transaction = transactionRepository
+            .findByIdAndUserId(transactionId, userId)
+            .orElseThrow(() ->
+                    new RuntimeException("Transaction not found"));
+
+    transaction.setTitle(request.getTitle());
+    transaction.setAmount(request.getAmount());
+    transaction.setType(request.getType());
+    transaction.setCategory(request.getCategory());
+    transaction.setDate(request.getDate());
+
+    return transactionRepository.save(transaction);
+}
 }
