@@ -4,6 +4,7 @@ import com.fintrack.fintrack.dto.UserRequest;
 import com.fintrack.fintrack.dto.UserResponse;
 import com.fintrack.fintrack.entity.User;
 import com.fintrack.fintrack.service.UserService;
+import com.fintrack.fintrack.dto.LoginRequest;
 
 import jakarta.validation.Valid;
 
@@ -52,6 +53,17 @@ public class UserController {
 
         return ResponseEntity.ok(convertToResponse(savedUser));
     }
+    @PostMapping("/login")
+public ResponseEntity<UserResponse> login(
+        @Valid @RequestBody LoginRequest request) {
+
+    User user = userService.login(
+            request.getEmail(),
+            request.getPassword()
+    );
+
+    return ResponseEntity.ok(convertToResponse(user));
+}
 
     private UserResponse convertToResponse(User user) {
         return new UserResponse(
