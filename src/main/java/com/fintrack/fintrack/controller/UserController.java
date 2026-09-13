@@ -5,7 +5,8 @@ import com.fintrack.fintrack.dto.UserResponse;
 import com.fintrack.fintrack.entity.User;
 import com.fintrack.fintrack.service.UserService;
 import com.fintrack.fintrack.dto.LoginRequest;
-
+import com.fintrack.fintrack.dto.LoginResponse;
+import com.fintrack.fintrack.service.JwtService;
 import jakarta.validation.Valid;
 
 
@@ -18,11 +19,13 @@ import java.util.List;
 @RequestMapping("/api/users")
 public class UserController {
 
-    private final UserService userService;
+private final UserService userService;
+private final JwtService jwtService;
 
-    public UserController(UserService userService) {
-        this.userService = userService;
-    }
+   public UserController(UserService userService, JwtService jwtService) {
+    this.userService = userService;
+    this.jwtService = jwtService;
+}
 
     @GetMapping
     public List<UserResponse> getAllUsers() {
@@ -53,8 +56,9 @@ public class UserController {
 
         return ResponseEntity.ok(convertToResponse(savedUser));
     }
-    @PostMapping("/login")
-public ResponseEntity<UserResponse> login(
+   
+@PostMapping("/login")
+public ResponseEntity<LoginResponse> login(
         @Valid @RequestBody LoginRequest request) {
 
     User user = userService.login(
@@ -62,9 +66,20 @@ public ResponseEntity<UserResponse> login(
             request.getPassword()
     );
 
-    return ResponseEntity.ok(convertToResponse(user));
-}
+    String token = jwtService.generateToken(
+            user.getId(),
+            user.getEmail()
+    );
 
+    LoginResponse response = new LoginResponse(
+            token,
+            user.getId(),
+            user.getName(),
+            user.getEmail()
+    );
+
+    return ResponseEntity.ok(response);
+}
     private UserResponse convertToResponse(User user) {
         return new UserResponse(
                 user.getId(),
